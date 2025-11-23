@@ -54,7 +54,7 @@ function valorAleatorio(min, max) {
 // Clase padre para los personajes
 class Personaje {
   constructor(nombre) {
-    this.hp = 100;
+    this.hp = 35;
     this.atk = valorAleatorio(1, 20);
     this.def = valorAleatorio(1, 20);
     this.spd = valorAleatorio(1, 20);
@@ -64,8 +64,8 @@ class Personaje {
 
 // Clase hija para los guerreros
 class Guerrero extends Personaje {
-  constructor(hp, atk, def, spd, nombre) {
-    super(hp, atk, def, spd, nombre);
+  constructor(nombre) {
+    super(nombre);
     this.habilidades = [
       {
         nombre: "Corte",
@@ -84,20 +84,17 @@ class Guerrero extends Personaje {
       },
     ];
   }
-  atacar(objetivo) {
+  atacar() {
     const habilidad =
       this.habilidades[Math.floor(Math.random() * this.habilidades.length)];
-    objetivo.hp -= habilidad.daño;
-    console.log(
-      `${this.nombre} ataca a ${objetivo.nombre} con ${habilidad.nombre} y le inflige ${habilidad.daño} de daño. HP restante: ${objetivo.hp}`
-    );
+    return habilidad;
   }
 }
 
 // Clase hija para los magos
 class Mago extends Personaje {
-  constructor(hp, atk, def, spd, nombre) {
-    super(hp, atk, def, spd, nombre);
+  constructor(nombre) {
+    super(nombre);
     this.habilidades = [
       {
         nombre: "Bola de fuego",
@@ -116,20 +113,17 @@ class Mago extends Personaje {
       },
     ];
   }
-  atacar(objetivo) {
+  atacar() {
     const habilidad =
       this.habilidades[Math.floor(Math.random() * this.habilidades.length)];
-    objetivo.hp -= habilidad.daño;
-    console.log(
-      `${this.nombre} ataca a ${objetivo.nombre} con ${habilidad.nombre} y le inflige ${habilidad.daño} de daño. HP restante: ${objetivo.hp}`
-    );
+    return habilidad;
   }
 }
 
 // Clase hija para los arqueros
 class Arquero extends Personaje {
-  constructor(hp, atk, def, spd, nombre) {
-    super(hp, atk, def, spd, nombre);
+  constructor(nombre) {
+    super(nombre);
     this.habilidades = [
       {
         nombre: "Flecha",
@@ -148,13 +142,10 @@ class Arquero extends Personaje {
       },
     ];
   }
-  atacar(objetivo) {
+  atacar() {
     const habilidad =
       this.habilidades[Math.floor(Math.random() * this.habilidades.length)];
-    objetivo.hp -= habilidad.daño;
-    console.log(
-      `${this.nombre} ataca a ${objetivo.nombre} con ${habilidad.nombre} y le inflige ${habilidad.daño} de daño. HP restante: ${objetivo.hp}`
-    );
+    return habilidad;
   }
 }
 
@@ -166,12 +157,12 @@ const personajes = [
 ];
 
 // Array de objetivos (enemigos)
-let objetivos = [
-  new Personaje("Orco"),
+const enemigos = [
+  new Guerrero("Orco"),
   new Mago("Saruman el Blanco"),
   (() => {
-    const sauron = new Personaje("Sauron");
-    sauron.atk *= 2;
+    const sauron = new Mago("Sauron");
+    sauron.atk *= 2.5;
     sauron.def *= 2;
     return sauron;
   })(),
@@ -181,20 +172,68 @@ let objetivos = [
 function iniciarBatalla() {
   let turno = 0;
 
-  let personajeActual = personajes.find((personaje) => personaje.hp > 0);
+  console.log("========================================");
+  console.log("...Iniciando batalla...");
+  console.log("========================================");
 
-  let personajeObjetivo =
-    objetivos[Math.floor(Math.random() * objetivos.length)];
+  // cargabdo a todos los personajes
+  let todosLosPersonajes = [...personajes, ...enemigos];
 
-  console.log(
-    "...Iniciando batalla...\n" +
-      turno +
-      " - " +
-      personajeActual.nombre +
-      " ataca a " +
-      personajeObjetivo.nombre
-  );
+  // ordenandolos por orden de velocidad
+  todosLosPersonajes.sort((a, b) => b.spd - a.spd);
+
+  // bluque principal
+  while (todosLosPersonajes.filter((p) => p.hp > 0).length > 1) {
+    turno++;
+    for (let i = 0; i < todosLosPersonajes.length; i++) {
+      if (todosLosPersonajes[i].hp <= 0) continue;
+
+      let atacante = todosLosPersonajes[i];
+
+      let enemigos = todosLosPersonajes.filter(
+        (p) => p.hp > 0 && p !== atacante
+      );
+
+      if (enemigos.length === 0) continue;
+
+      let enemigo = enemigos[Math.floor(Math.random() * enemigos.length)];
+
+      let habilidad = atacante.atacar();
+
+      //calculando dano real y confimando que el valor no sea negativo
+      let danoReal = habilidad.daño - enemigo.def;
+      if (danoReal < 1) danoReal = 1;
+
+      // aplicando dano al enemigo
+      enemigo.hp -= danoReal;
+
+      // Asegurar que el HP no sea negativo
+      if (enemigo.hp < 0) {
+        enemigo.hp = 0;
+      }
+
+      console.log(
+        `Turno ${turno} ${atacante.nombre} ataco a ${enemigo.nombre} con ${habilidad.nombre} y le infringio ${danoReal} de dano. HP ${enemigo.hp}`
+      );
+
+      if (enemigo.hp <= 0) {
+        console.log(
+          `${enemigo.nombre} ha sido eliminado por ${atacante.nombre} con ${habilidad.nombre}`
+        );
+      }
+    }
+
+    // Eliminar personajes muertos después de cada ronda
+    todosLosPersonajes = todosLosPersonajes.filter((p) => p.hp > 0);
+  }
+
+  // Declarar ganador
+  let ganador = todosLosPersonajes.find((p) => p.hp > 0);
+  if (ganador) {
+    console.log("========================================");
+    console.log(`¡El ganador es: ${ganador.nombre}!`);
+    console.log("========================================");
+  }
 }
 
-console.log(personajes);
-console.log(objetivos);
+iniciarBatalla();
