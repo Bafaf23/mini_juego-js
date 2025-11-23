@@ -213,7 +213,7 @@ function iniciarBatalla() {
       }
 
       console.log(
-        `Turno ${turno} ${atacante.nombre} ataco a ${enemigo.nombre} con ${habilidad.nombre} y le infringio ${danoReal} de dano. HP ${enemigo.hp}`
+        `Turno ${turno} ${atacante.nombre} ataco a ${enemigo.nombre} con ${habilidad.nombre} y le infringio ${danoReal} de daño. HP ${enemigo.hp}`
       );
 
       if (enemigo.hp <= 0) {
