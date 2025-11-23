@@ -158,11 +158,43 @@ class Arquero extends Personaje {
   }
 }
 
-// Crear un array de personajes
+// Array de personajes
 const personajes = [
   new Guerrero("Conan"),
   new Mago("Gandalf el Gris"),
   new Arquero("Legolas"),
 ];
 
-console.log(personajes[0].habilidades);
+// Array de objetivos (enemigos)
+let objetivos = [
+  new Personaje("Orco"),
+  new Mago("Saruman el Blanco"),
+  (() => {
+    const sauron = new Personaje("Sauron");
+    sauron.atk *= 2;
+    sauron.def *= 2;
+    return sauron;
+  })(),
+];
+
+// Función para iniciar la batalla
+function iniciarBatalla() {
+  let turno = 0;
+
+  let personajeActual = personajes.find((personaje) => personaje.hp > 0);
+
+  let personajeObjetivo =
+    objetivos[Math.floor(Math.random() * objetivos.length)];
+
+  console.log(
+    "...Iniciando batalla...\n" +
+      turno +
+      " - " +
+      personajeActual.nombre +
+      " ataca a " +
+      personajeObjetivo.nombre
+  );
+}
+
+console.log(personajes);
+console.log(objetivos);
