@@ -46,33 +46,41 @@
  * Fecha: 26/11/2025;
  */
 
+// Función para generar un valor aleatorio entre un mínimo y un máximo
+function valorAleatorio(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Clase padre para los personajes
 class Personaje {
-  constructor(hp, atk, def, spd) {
-    this.hp = hp;
-    this.atk = atk;
-    this.def = def;
-    this.spd = spd;
+  constructor(nombre) {
+    this.hp = 100;
+    this.atk = valorAleatorio(1, 20);
+    this.def = valorAleatorio(1, 20);
+    this.spd = valorAleatorio(1, 20);
+    this.nombre = nombre;
   }
 }
 
+// Clase hija para los guerreros
 class Guerrero extends Personaje {
-  constructor(hp, atk, def, spd) {
-    super(hp, atk, def, spd);
+  constructor(hp, atk, def, spd, nombre) {
+    super(hp, atk, def, spd, nombre);
     this.habilidades = [
       {
         nombre: "Corte",
         descripcion: "Corta a su objetivo con su espada",
-        daño: 10,
+        daño: this.atk,
       },
       {
         nombre: "Golpe de espada",
         descripcion: "Golpea a su objetivo con su espada",
-        daño: 15,
+        daño: this.atk,
       },
       {
         nombre: "Ataque triple",
         descripcion: "Ataque triple a su objetivo",
-        daño: 20,
+        daño: this.atk * 3,
       },
     ];
   }
@@ -86,23 +94,75 @@ class Guerrero extends Personaje {
   }
 }
 
+// Clase hija para los magos
 class Mago extends Personaje {
-  constructor(hp, atk, def, spd) {
-    super(hp, atk, def, spd);
+  constructor(hp, atk, def, spd, nombre) {
+    super(hp, atk, def, spd, nombre);
+    this.habilidades = [
+      {
+        nombre: "Bola de fuego",
+        descripcion: "Crea una bola de fuego que explota al impactar",
+        daño: this.atk,
+      },
+      {
+        nombre: "Bola de hielo",
+        descripcion: "Crea una bola de hielo que explota al impactar",
+        daño: this.atk,
+      },
+      {
+        nombre: "Bola de terremoto",
+        descripcion: "Crea una bola de terremoto que explota al impactar",
+        daño: this.atk * 3,
+      },
+    ];
+  }
+  atacar(objetivo) {
+    const habilidad =
+      this.habilidades[Math.floor(Math.random() * this.habilidades.length)];
+    objetivo.hp -= habilidad.daño;
+    console.log(
+      `${this.nombre} ataca a ${objetivo.nombre} con ${habilidad.nombre} y le inflige ${habilidad.daño} de daño. HP restante: ${objetivo.hp}`
+    );
   }
 }
 
+// Clase hija para los arqueros
 class Arquero extends Personaje {
-  constructor(hp, atk, def, spd) {
-    super(hp, atk, def, spd);
+  constructor(hp, atk, def, spd, nombre) {
+    super(hp, atk, def, spd, nombre);
+    this.habilidades = [
+      {
+        nombre: "Flecha",
+        descripcion: "Dispara una flecha a su objetivo",
+        daño: this.atk,
+      },
+      {
+        nombre: "Flecha triple",
+        descripcion: "Dispara tres flechas a su objetivo",
+        daño: this.atk * 3,
+      },
+      {
+        nombre: "Flecha de fuego",
+        descripcion: "Dispara una flecha de fuego a su objetivo",
+        daño: this.atk * 3,
+      },
+    ];
+  }
+  atacar(objetivo) {
+    const habilidad =
+      this.habilidades[Math.floor(Math.random() * this.habilidades.length)];
+    objetivo.hp -= habilidad.daño;
+    console.log(
+      `${this.nombre} ataca a ${objetivo.nombre} con ${habilidad.nombre} y le inflige ${habilidad.daño} de daño. HP restante: ${objetivo.hp}`
+    );
   }
 }
 
-class Brujo extends Personaje {
-  constructor(hp, atk, def, spd) {
-    super(hp, atk, def, spd);
-  }
-}
+// Crear un array de personajes
+const personajes = [
+  new Guerrero("Conan"),
+  new Mago("Gandalf el Gris"),
+  new Arquero("Legolas"),
+];
 
-const guerrero = new Guerrero(100, 10, 5, 8);
-console.log(guerrero);
+console.log(personajes[0].habilidades);
