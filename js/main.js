@@ -186,9 +186,9 @@ function iniciarBatalla() {
   while (todosLosPersonajes.filter((p) => p.hp > 0).length > 1) {
     turno++;
     for (let i = 0; i < todosLosPersonajes.length; i++) {
-      if (todosLosPersonajes[i].hp <= 0) continue;
+      if (todosLosPersonajes[i].hp <= 0) break;
 
-      let atacante = todosLosPersonajes[i];
+      let atacante = todosLosPersonajes[0];
 
       let enemigos = todosLosPersonajes.filter(
         (p) => p.hp > 0 && p !== atacante
@@ -197,7 +197,7 @@ function iniciarBatalla() {
       if (enemigos.length === 0) continue;
 
       let enemigo = enemigos[Math.floor(Math.random() * enemigos.length)];
-
+      // obteniendo habilidad del atacante
       let habilidad = atacante.atacar();
 
       //calculando dano real y confimando que el valor no sea negativo
@@ -207,33 +207,52 @@ function iniciarBatalla() {
       // aplicando dano al enemigo
       enemigo.hp -= danoReal;
 
-      // Asegurar que el HP no sea negativo
+      // Asegurar que el HP no sea un valor negativo
       if (enemigo.hp < 0) {
         enemigo.hp = 0;
       }
 
+      // mensaje por consola del turno
       console.log(
-        `Turno ${turno} ${atacante.nombre} ataco a ${enemigo.nombre} con ${habilidad.nombre} y le infringio ${danoReal} de daño. HP ${enemigo.hp}`
+        `Turno: ${turno} - ${atacante.nombre} ataco a ${enemigo.nombre} con "${habilidad.nombre}" y le infringio ${danoReal} de daño. HP: ${enemigo.hp}`
       );
 
       if (enemigo.hp <= 0) {
-        console.log(
-          `${enemigo.nombre} ha sido eliminado por ${atacante.nombre} con ${habilidad.nombre}`
-        );
-      }
-    }
+        console.log(`⚔️ ${enemigo.nombre} ha sido eliminado 💀`);
+      } else {
+        // contratacando al atacante
+        const contraataque = enemigo.atacar();
 
-    // Eliminar personajes muertos después de cada ronda
-    todosLosPersonajes = todosLosPersonajes.filter((p) => p.hp > 0);
+        // calculando dano real y confimando que el valor no sea negativo
+        let danoContraataque = contraataque.daño - atacante.def;
+        // asegurando que el daño no sea un valor negativo
+        if (danoContraataque < 1) danoContraataque = 1;
+        // aplicando dano al atacante
+        atacante.hp -= danoContraataque;
+        // asegurando que el HP no sea un valor negativo
+        if (atacante.hp < 0) atacante.hp = 0;
+
+        // mensaje por consola del contraataque
+        console.log(
+          ` 🔃 ${atacante.nombre} ha sido contratacado por ${enemigo.nombre} con "${contraataque.nombre}" y le infringio ${danoContraataque} de daño. HP: ${atacante.hp}`
+        );
+
+        // mensaje por consola del contraataque
+        if (atacante.hp <= 0) {
+          console.log(`⚔️ ${atacante.nombre} ha sido eliminado 💀`);
+        }
+      }
+      // Eliminar personajes muertos después de cada ronda
+      todosLosPersonajes = todosLosPersonajes.filter((p) => p.hp > 0);
+    }
   }
 
   // Declarar ganador
   let ganador = todosLosPersonajes.find((p) => p.hp > 0);
   if (ganador) {
-    console.log("========================================");
-    console.log(`¡El ganador es: ${ganador.nombre}!`);
-    console.log("========================================");
+    console.log("===================⚔️ 🏆 🎉=====================");
+    console.log(`🏆 ¡El ganador es: ${ganador.nombre}!🎉`);
+    console.log(` HP final: ${ganador.hp} 💖`);
+    console.log("===================⚔️ 🏆 🎉=====================");
   }
 }
-
-iniciarBatalla();
